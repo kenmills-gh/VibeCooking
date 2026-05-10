@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-// Defining the shape of our expected JSON response
 interface Recipe {
   recipeName: string;
   vibeMatchRationale: string;
@@ -11,24 +10,12 @@ interface Recipe {
 
 function App() {
   const [ingredients, setIngredients] = useState("");
-  const [vibe, setVibe] = useState(""); // Default to empty for "Surprise Me"
+  const [vibe, setVibe] = useState("");
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // The blank string at the top acts as our "No Vibe" option
-  const vibesList = [
-    "",
-    "15-Minute Lazy Dinner",
-    "Fancy Date Night",
-    "Comforting & Cozy",
-    "Post-Workout Fuel",
-    "Healthy & Fresh",
-    "Midnight Snack",
-  ];
-
   const generateRecipe = async () => {
-    // Only throw an error if BOTH inputs are entirely empty
     if (!ingredients.trim() && !vibe) {
       setError("Please provide some ingredients or select a vibe!");
       return;
@@ -43,147 +30,265 @@ function App() {
         "http://localhost:5000/api/generate-recipe",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ingredients, vibe }),
         },
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch recipe from server");
-      }
+      if (!response.ok) throw new Error("Failed to fetch recipe from server");
 
       const data = await response.json();
       setRecipe(data);
     } catch (err) {
       console.error(err);
-      setError(
-        "Something went wrong generating your recipe. Is the server running?",
-      );
+      setError("Something went wrong generating your recipe.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 p-6 md:p-12 font-sans">
-      <div className="max-w-3xl mx-auto">
-        {/* Header */}
-        <header className="mb-10 text-center">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 mb-2">
-            VibeCooking 🍳
-          </h1>
-          <p className="text-slate-400 text-lg">
-            Turn whatever is in your fridge into a vibe.
-          </p>
-        </header>
-
-        {/* Input Section */}
-        <div className="bg-slate-800 p-6 rounded-2xl shadow-xl mb-8 border border-slate-700">
-          <div className="mb-5">
-            <label className="block text-sm font-semibold text-slate-300 mb-2">
-              What's in your kitchen? (Ingredients)
-            </label>
-            <textarea
-              className="w-full bg-slate-900 text-slate-100 border border-slate-600 rounded-lg p-4 focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all"
-              rows={3}
-              placeholder="e.g., chicken breast, leftover rice, soy sauce... (Optional if selecting a vibe)"
-              value={ingredients}
-              onChange={(e) => setIngredients(e.target.value)}
-            />
+    <div className="bg-background text-on-background font-body-md min-h-screen flex flex-col">
+      {/* TopNavBar */}
+      <header className="bg-background shadow-[0px_4px_20px_rgba(57,103,86,0.05)] sticky top-0 z-40 hidden md:block">
+        <div className="flex justify-between items-center px-4 md:px-16 py-4 w-full max-w-[1280px] mx-auto">
+          <div className="font-headline-md text-headline-md font-bold text-primary">
+            VibeCooking
           </div>
-
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-slate-300 mb-2">
-              Select the Vibe
-            </label>
-            <select
-              className="w-full bg-slate-900 text-slate-100 border border-slate-600 rounded-lg p-4 focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all"
-              value={vibe}
-              onChange={(e) => setVibe(e.target.value)}
+          <nav className="flex gap-8 items-center">
+            <a
+              className="text-primary font-label-bold text-label-bold border-b-2 border-primary pb-1"
+              href="#"
             >
-              <option value="">✨ Any Vibe / Surprise Me</option>
-              {vibesList
-                .filter((v) => v !== "")
-                .map((v) => (
-                  <option key={v} value={v}>
-                    {v}
-                  </option>
-                ))}
-            </select>
+              Explore
+            </a>
+            <a
+              className="text-secondary font-label-bold text-label-bold hover:text-primary transition-colors"
+              href="#"
+            >
+              My Library
+            </a>
+            <a
+              className="text-secondary font-label-bold text-label-bold hover:text-primary transition-colors"
+              href="#"
+            >
+              Meal Planner
+            </a>
+          </nav>
+          <div className="flex gap-4 items-center">
+            <button className="text-secondary hover:text-primary transition-colors">
+              <span className="material-symbols-outlined">notifications</span>
+            </button>
+            <button className="text-secondary hover:text-primary transition-colors">
+              <span className="material-symbols-outlined">account_circle</span>
+            </button>
           </div>
-
-          {error && <p className="text-red-400 text-sm mb-4">{error}</p>}
-
-          <button
-            onClick={generateRecipe}
-            disabled={loading}
-            className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-bold py-4 px-6 rounded-lg transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg"
-          >
-            {loading ? "Cooking up a vibe... 👨‍🍳" : "Generate Recipe"}
-          </button>
         </div>
+      </header>
 
-        {/* Results Section */}
-        {recipe && (
-          <div className="bg-slate-800 p-6 md:p-8 rounded-2xl shadow-2xl border border-emerald-500/30 animate-fade-in-up">
-            <div className="mb-6 border-b border-slate-700 pb-6 text-center">
-              <h2 className="text-3xl font-bold text-emerald-400 mb-3">
-                {recipe.recipeName}
+      {/* Main Content Canvas */}
+      <main className="flex-grow w-full max-w-[1280px] mx-auto px-4 md:px-16 py-8 md:py-12 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* Left Column: Input Form */}
+          <section className="lg:col-span-5 space-y-6">
+            <div className="bg-surface-container-lowest rounded-xl p-6 md:p-8 shadow-[0px_4px_20px_rgba(57,103,86,0.05)] border border-surface-container hover:scale-[1.02] transition-transform duration-300">
+              <h2 className="font-headline-sm text-headline-sm text-secondary mb-6">
+                Start Cooking
               </h2>
-              <p className="text-slate-300 italic mb-2">
-                "{recipe.vibeMatchRationale}"
-              </p>
-              <div className="inline-block bg-slate-900 px-4 py-2 rounded-full text-sm font-medium text-cyan-400">
-                ⏱️ Prep Time: {recipe.prepTime}
-              </div>
+              <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+                <div className="space-y-2">
+                  <label className="font-label-bold text-label-bold text-on-surface-variant block">
+                    What's in your fridge?
+                  </label>
+                  <textarea
+                    className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-3 text-on-background focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary font-body-md transition-colors resize-none placeholder:text-outline"
+                    placeholder="e.g., Salmon, Asparagus, Lemon..."
+                    rows={4}
+                    value={ingredients}
+                    onChange={(e) => setIngredients(e.target.value)}
+                  />
+                  {error && (
+                    <p className="text-error font-label-sm text-label-sm">
+                      {error}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <label className="font-label-bold text-label-bold text-on-surface-variant block">
+                    Choose your Vibe
+                  </label>
+                  <select
+                    className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-3 text-on-background focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary font-body-md transition-colors"
+                    value={vibe}
+                    onChange={(e) => setVibe(e.target.value)}
+                  >
+                    <option value="">✨ Surprise Me...</option>
+                    <option value="Cozy Night In">Cozy Night In</option>
+                    <option value="Gourmet Date Night">
+                      Gourmet Date Night
+                    </option>
+                    <option value="Quick & Healthy">Quick & Healthy</option>
+                    <option value="Late Night Snack">Late Night Snack</option>
+                    <option value="Party Appetizer">Party Appetizer</option>
+                  </select>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={generateRecipe}
+                  disabled={loading}
+                  className="w-full bg-primary text-on-primary hover:bg-primary-container hover:text-on-primary-container rounded-lg py-4 px-6 flex items-center justify-center gap-2 font-label-bold text-label-bold transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                  <span className="material-symbols-outlined">
+                    auto_awesome
+                  </span>
+                  {loading ? "Cooking..." : "Generate Recipe"}
+                </button>
+              </form>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8">
-              {/* Ingredients List */}
-              <div className="md:col-span-1 bg-slate-900/50 p-5 rounded-xl border border-slate-700/50">
-                <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
-                  🛒 Ingredients
-                </h3>
-                <ul className="space-y-2">
-                  {recipe.ingredientsList.map((item, idx) => (
-                    <li
-                      key={idx}
-                      className="text-slate-300 text-sm flex items-start"
-                    >
-                      <span className="text-emerald-500 mr-2">•</span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Instructions */}
-              <div className="md:col-span-2">
-                <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
-                  📝 Instructions
-                </h3>
-                <ol className="space-y-4">
-                  {recipe.instructions.map((step, idx) => (
-                    <li
-                      key={idx}
-                      className="flex gap-4 bg-slate-900/30 p-4 rounded-xl"
-                    >
-                      <span className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 font-bold">
-                        {idx + 1}
-                      </span>
-                      <span className="text-slate-300 leading-relaxed">
-                        {step}
-                      </span>
-                    </li>
-                  ))}
-                </ol>
+            {/* Decorative Image Card */}
+            <div className="hidden lg:block bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0px_4px_20px_rgba(57,103,86,0.05)] h-64 relative group">
+              <img
+                src="https://images.unsplash.com/photo-1467003909585-2f8a72700288?q=80&w=800&auto=format&fit=crop"
+                alt="Fresh ingredients"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
+                <p className="font-headline-sm text-headline-sm text-on-primary">
+                  Fresh Inspiration
+                </p>
               </div>
             </div>
-          </div>
-        )}
-      </div>
+          </section>
+
+          {/* Right Column: Dynamic Content Area */}
+          <section className="lg:col-span-7 space-y-6">
+            {/* 1. Loading State */}
+            {loading && (
+              <div className="bg-surface-container-lowest rounded-xl p-12 shadow-[0px_4px_20px_rgba(57,103,86,0.05)] border border-surface-container flex flex-col items-center justify-center text-center h-full min-h-[400px]">
+                <span className="material-symbols-outlined text-display-lg text-primary animate-spin mb-6">
+                  restaurant_menu
+                </span>
+                <h3 className="font-headline-md text-headline-md shimmer mb-2">
+                  AI is cooking...
+                </h3>
+                <p className="font-body-md text-body-md text-on-surface-variant">
+                  Crafting the perfect recipe for your vibe.
+                </p>
+              </div>
+            )}
+
+            {/* 2. Recipe Output State */}
+            {!loading && recipe && (
+              <div className="bg-surface-container-lowest rounded-xl p-6 md:p-8 shadow-[0px_4px_20px_rgba(57,103,86,0.05)] border border-surface-container flex flex-col gap-8 hover:shadow-lg transition-shadow duration-300">
+                <div className="border-b border-surface-variant pb-6">
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    <span className="bg-primary-fixed text-on-primary-fixed-variant px-3 py-1 rounded-full font-label-sm text-label-sm">
+                      {vibe || "Chef's Surprise"}
+                    </span>
+                    <span className="bg-secondary-fixed text-on-secondary-fixed-variant px-3 py-1 rounded-full font-label-sm text-label-sm">
+                      AI Generated
+                    </span>
+                  </div>
+                  <h1 className="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-secondary mb-4">
+                    {recipe.recipeName}
+                  </h1>
+                  <div className="bg-surface-container-low p-4 rounded-lg border-l-4 border-primary">
+                    <p className="font-body-md text-body-md text-on-surface-variant italic">
+                      "{recipe.vibeMatchRationale}"
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-6 mt-6">
+                    <div className="flex items-center gap-2 text-tertiary">
+                      <span className="material-symbols-outlined">
+                        schedule
+                      </span>
+                      <span className="font-label-bold text-label-bold">
+                        {recipe.prepTime}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div>
+                    <h3 className="font-headline-sm text-headline-sm text-secondary mb-4 flex items-center gap-2">
+                      <span className="material-symbols-outlined text-primary">
+                        kitchen
+                      </span>
+                      Ingredients
+                    </h3>
+                    <ul className="space-y-3">
+                      {recipe.ingredientsList.map((item, idx) => (
+                        <li key={idx} className="flex items-start gap-3">
+                          <input
+                            type="checkbox"
+                            className="mt-1 rounded border-outline text-primary focus:ring-primary w-4 h-4"
+                          />
+                          <span className="font-body-md text-body-md text-on-background">
+                            {item}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="font-headline-sm text-headline-sm text-secondary mb-4 flex items-center gap-2">
+                      <span className="material-symbols-outlined text-primary">
+                        skillet
+                      </span>
+                      Instructions
+                    </h3>
+                    <ol className="space-y-6 relative border-l border-surface-variant ml-3 pl-6">
+                      {recipe.instructions.map((step, idx) => (
+                        <li key={idx} className="relative">
+                          <span className="absolute -left-[35px] bg-primary text-on-primary w-6 h-6 rounded-full flex items-center justify-center font-label-bold text-label-sm shadow-sm">
+                            {idx + 1}
+                          </span>
+                          <p className="font-body-md text-body-md text-on-background">
+                            {step}
+                          </p>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex gap-4 pt-6 border-t border-surface-variant">
+                  <button className="flex-1 bg-surface-variant text-on-surface hover:bg-tertiary-container transition-colors py-3 px-6 rounded-lg font-label-bold text-label-bold flex items-center justify-center gap-2">
+                    <span className="material-symbols-outlined">
+                      bookmark_border
+                    </span>
+                    Save Recipe
+                  </button>
+                  <button className="flex-1 border-2 border-secondary text-secondary hover:bg-secondary-container transition-colors py-3 px-6 rounded-lg font-label-bold text-label-bold flex items-center justify-center gap-2">
+                    <span className="material-symbols-outlined">share</span>
+                    Share
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* 3. Empty State (Before searching) */}
+            {!loading && !recipe && (
+              <div className="hidden lg:flex bg-surface-container-lowest rounded-xl p-12 shadow-[0px_4px_20px_rgba(57,103,86,0.05)] border border-surface-container flex-col items-center justify-center text-center h-full min-h-[400px]">
+                <span className="material-symbols-outlined text-display-lg text-tertiary mb-6 opacity-50">
+                  ramen_dining
+                </span>
+                <h3 className="font-headline-md text-headline-md text-secondary mb-2">
+                  Ready to Cook?
+                </h3>
+                <p className="font-body-md text-body-md text-on-surface-variant">
+                  Tell me what you have, and I'll find the perfect recipe.
+                </p>
+              </div>
+            )}
+          </section>
+        </div>
+      </main>
     </div>
   );
 }

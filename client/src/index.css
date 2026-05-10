@@ -1,1 +1,68 @@
 @import "tailwindcss";
+
+@theme {
+  /* Colors */
+  --color-background: #fff8f5;
+  --color-on-background: #1e1b18;
+  --color-primary: #a04100;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #ff6b00;
+  --color-on-primary-container: #572000;
+  --color-secondary: #396756;
+  --color-on-secondary: #ffffff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container: #f5ece7;
+  --color-surface-variant: #e9e1dc;
+  --color-on-surface-variant: #5a4136;
+  --color-outline-variant: #e2bfb0;
+  --color-outline: #8e7164;
+  --color-tertiary: #605e58;
+  --color-primary-fixed: #ffdbcc;
+  --color-on-primary-fixed-variant: #7a3000;
+  --color-secondary-fixed: #bcedd7;
+  --color-on-secondary-fixed-variant: #214f3f;
+  --color-error: #ba1a1a;
+
+  /* Fonts */
+  --font-body-md: "Plus Jakarta Sans", sans-serif;
+  --font-label-bold: "Plus Jakarta Sans", sans-serif;
+  --font-label-sm: "Plus Jakarta Sans", sans-serif;
+  --font-headline-sm: "Newsreader", serif;
+  --font-headline-md: "Newsreader", serif;
+  --font-display-lg: "Newsreader", serif;
+  --font-display-lg-mobile: "Newsreader", serif;
+
+  /* Font Sizes */
+  --text-label-sm: 12px;
+  --text-label-bold: 14px;
+  --text-body-md: 16px;
+  --text-headline-sm: 24px;
+  --text-headline-md: 32px;
+  --text-display-lg-mobile: 36px;
+  --text-display-lg: 48px;
+}
+
+/* Material Icons Setup */
+.material-symbols-outlined {
+  font-variation-settings:
+    "FILL" 0,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 24;
+}
+
+/* Custom AI Loading Animation */
+.shimmer {
+  background: linear-gradient(90deg, #396756 0%, #ff6b00 50%, #396756 100%);
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: shimmer 2s linear infinite;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: 200% center;
+  }
+}
